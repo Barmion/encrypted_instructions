@@ -1,32 +1,24 @@
-# Номер успешной посылки 123760667
+# Номер успешной посылки 123867589
+
+from collections import deque
+
 
 def decrypt(short_message: str) -> str:
-    full_message = [short_message[0]]
-    multiple = ''
-    for i in short_message[1:]:
+    full_message, multiple = '', 0
+    stack = deque()
+    for i in short_message:
         if i.isalpha():
-            while full_message[-1].isdigit():
-                multiple = full_message.pop() + multiple
-                if not full_message:
-                    break
-        if multiple:
-            full_message += i * int(multiple)
-            multiple = ''
-        else:
             full_message += i
-        if i == ']':
-            bracket = ''
-            full_message.pop()
-            while full_message[-1] != '[':
-                bracket = full_message.pop() + bracket
-            full_message.pop()
-            while full_message[-1].isdigit():
-                multiple = full_message.pop() + multiple
-                if not full_message:
-                    break
-            full_message += bracket * int(multiple)
-            multiple = ''
-    return ''.join(full_message)
+        elif i.isdigit():
+            multiple = multiple * 10 + int(i)
+        elif i == '[':
+            stack.append((full_message, multiple))
+            full_message, multiple = '', 0
+        elif i == ']':
+            first_part, multiple = stack.pop()
+            full_message = first_part + multiple * full_message
+            multiple = 0
+    return full_message
 
 
 def main():
@@ -36,3 +28,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    
